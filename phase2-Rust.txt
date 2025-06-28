@@ -1,0 +1,439 @@
+Program-s
+pub fn process_instruction(
+    program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    // Parameters received by the program (smart contract)
+    instruction_data: &[u8]
+) -> ProgramResult {}
+
+// solana_program::native_token::LAMPORTS_PER_SOL
+pub const LAMPORTS_PER_SOL: u64 = 1_000_000_000;
+
+nos in diff bases-
+let x: i32 = 100_000_000;
+let y: i32 = 0xffab;
+let z: i32 = 0o77;
+let m: i32 = 0b1111_0000;
+let n: u8 = b'A';
+println!("x = {}, y = {}, z = {}, m = {}, n = {}", x, y, z, m, n);
+
+The isize and usize types depend on the CPU type the program is running on. If the CPU is 32-bit, these types are 32-bit; if the CPU is 64-bit, then they are 64-bit.
+
+'char'- 4 bytes of space. This is fixed. Benefits-
+● Ensure that all char values occupy a fixed size in memory, which is beneficial to memory alignment and access efficiency.
+● Avoid encoding conversion overhead and use 4-byte values directly for efficient character processing.
+● Sufficient to represent all code points required to represent a Unicode scalar value, ensuring future compatibility.
+
+-UTF-8 is a variable-length encoding and can use 1 to 4 bytes to represent a character.
+-For ASCII characters, UTF-8 only needs 1 byte, while other characters may require 2, 3, or 4 bytes.
+
+boolean- 1 byte of memory.
+
+use std::thread;
+use std::time::Duration;
+
+// This function takes 3 seconds
+fn get_calculate_result() -> bool {
+		// Simulating complex calculations takes 3 seconds
+		thread::sleep(Duration::from_secs(3));
+    println!("called this function");
+    false
+}
+
+fn main() {
+    // Print individual characters in various languages
+    let thai_char  = 'ก';
+    let korean_char = '한';
+    let traditional_chinese_char = '繁';
+    let indonesian_char = 'ä';
+    // Note that str here is a string type, not a character, but the length is 1
+    let str = "国";
+    println!("thai_char : {}", thai_char );
+    println!("Korean: {}", korean_char);
+    println!("Traditional Chinese: {}", traditional_chinese_char);
+    println!("Indonesian: {}", indonesian_char);
+    
+    //Test how many characters there are between '你' and '我'
+    for i in '你'..='我' {
+        print!("{}", i);//你佡佢佣……戏成我，total 4786 char
+    }
+    
+    let f: bool = true;
+    // The short-circuit principle is triggered and the get_calculate_result function will not be called for complex calculations.
+    // If changed to get_calculate_result() | f, the function will be called first, which will have a performance impact
+    if f || get_calculate_result() {
+        println!("Success!");
+    }    
+}
+
+
+Short circuit principle -&& (and) and || (or) operaators function- ek true hoga/nahi hoga toh kya hoga/nahi hoga
+
+Statements- execution units. They perform some operations but do not return a value, and they end with a ;
+
+Expressions- computational units. They calculate and return a value, so expressions can be used for assignments. Common expressions include function calls, macro calls, and code blocks created with curly braces. 
+
+Units-a function or expression doesn't return a value, is represented by the symbol ().
+
+Statements are the executors of tasks, and expressions are the results of calculations, together forming the dynamic process of a program.
+
+Code- let a = 1;
+
+    // Statement: since statements do not return a value, attempting to bind a statement (let a = 1) to variable b will result in a compilation error
+    let b = (let a = 1);
+
+    // Expression: the return value is x + 1
+    let y = {
+        let x = 3;
+        x + 1
+    };
+    println!("The value of y is: {}", y); // y = 4
+
+
+Contract in Solana-
+// Mark process_instruction function as the entry point for the program
+entrypoint!(process_instruction);
+
+// Function name follows snake_case naming convention
+pub fn process_instruction(
+    // Parameters must explicitly specify types
+    program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    instruction_data: &[u8]
+    // Function return type is the ProgramResult enum
+) -> ProgramResult {
+    msg!("Hello, world!");
+
+    Ok(())
+}
+
+// Return type is an enum with variants of Result type
+enum ProgramResult {
+    // You can omit the Result:: prefix and directly use OK
+    Ok(()),
+    // Err value is still an enum type
+    Err(ProgramError),
+}
+
+// Error enum
+pub enum ProgramError {
+    Custom(u32),
+    InvalidArgument,
+    InvalidInstructionData,
+    // ...
+}
+
+
+// A divergent function that never returns, marked with !. Diverging functions refer to functions that never return, not even the default unit type () return value. These functions are usually marked with the ! type. They are commonly used for handling errors or unrecoverable situations, expressing this state by terminating the program's execution.
+fn diverging() -> ! {
+     // Throw a panic exception and terminate the program.
+     panic!("This function will never return!");
+}
+
+Stack Memory: It primarily stores data of fixed size basic data types, and the allocation and deallocation are very fast. It stores values in the order they are placed and retrieves values in the reverse order. This is also known as Last In, First Out (LIFO).
+Heap Memory: It stores data structures whose size dynamically changes at runtime, allowing more flexible data sharing and dynamic allocation. When putting data into the heap, the memory allocator finds a large enough space, marks it as used, and returns a pointer representing the address of that location.
+Dynamic String(String type): These are collections of char with a variable size. This type allows programs to dynamically manage string data on the heap at runtime, such as allocating, growing, and modifying string content. This capability enables the storage of content with unknown sizes at compile time.
+
+Shallow copying vs cloning
+shallow copy", meaning only references are copied, not the data 
+cloning- heap data is copied along with the reference
+
+Ownership- 
+Three Ownership Principles:
+1.
+Each value in Rust has a variable that is its owner.
+2.
+A value can have only one owner at a time.
+3.
+When the owner (variable) goes out of scope, the value will be dropped.
+
+when a variable leaves its scope, not only does the variable become invalid, but its memory (if it occupies memory) is also dropped.
+ownership transfer (move) involves two parts: shallow copy + old variable loses ownership.
+
+
+references-
+Use of references in Solana program entry point-
+entrypoint!(process_instruction);
+
+pub fn process_instruction(
+  program_id: &Pubkey,
+  accounts: &[AccountInfo],
+  instruction_data: &[u8]
+) -> ProgramResult {}
+
+
+mutable, immutable and dangling references-
+// Immutable reference, get the length of the value
+fn calculate_length(s: &String) -> usize {
+     s.len()
+}
+
+// mutable reference
+fn change(some_string: &mut String) {
+     some_string.push_str(", hackquest.");
+}
+
+// Dangling reference (compilation fails)
+fn dangle() -> &String {
+     //Create variable s with string ownership
+     let s = String::from("hello");
+
+     // Return the borrowed object
+     &s
+    
+} //After leaving the scope of the function body, the memory space of variable s will be automatically released. At this time &s becomes an invalid pointer (dangling reference), therefore,
+   //Compilation will fail
+
+fn main() {
+     let s1 = String::from("hello");
+
+     // &s1 is an immutable reference (default), that is, we can only read the object in the function, but cannot modify the object.
+     let len = calculate_length(&s1);
+     println!("The length of '{}' is {}.", s1, len);
+
+     let mut s2 = String::from("hi");
+     // &mut s2 is a mutable reference, so the change function can modify the value
+     let r1 = &mut s2;
+     change(r1);
+
+     // Attempt to access object of dangling reference, compilation failed
+     // let reference_to_nothing = dangle();
+}
+
+
+// {:p} is a way of formatting strings in Rust, which means printing the hexadecimal representation of a pointer.
+09
+println!("The memory address of x is {:p}", y);
+
+
+
+Ownership can be transferred to functions. During the transfer, the owner's stack values will be copied to the parameter stack of the function call.
+struct Foo {
+    x: i32,
+}
+
+fn do_something(f: Foo) {
+    println!("{}", f.x);
+    // f is dropped (released) here
+}
+
+fn main() {
+    let foo = Foo { x: 42 };
+    // foo is transferred to do_something
+    do_something(foo);
+    // After this point, foo can no longer be used
+}
+
+
+Ownership transferred from a fn-
+fn do_something() -> Foo {
+    Foo { x: 42 }
+    // Ownership is moved out
+}
+
+fn main() {
+    let foo = do_something();
+    // foo becomes the owner
+    // foo is dropped at the end of the function scope
+}
+
+
+
+//moving ownerships-
+struct Foo {
+     x: i32,
+}
+
+fn do_something(f: Foo) {
+     println!("{}", f.x);
+     // f is dropped here and released
+}
+
+fn main() {
+     let mut foo = Foo { x: 42 };
+     let f = &mut foo;
+
+     // An error will be reported: do_something(foo);
+     // Unable to take ownership of foo because it has been mutably borrowed
+
+     // An error will be reported: foo.x = 13;
+     // Because foo has been mutably borrowed and cannot be modified
+
+     f.x = 13;
+     // f will be dropped because it will no longer be used.
+    
+     println!("{}", foo.x);
+    
+     // Now modifications can proceed normally because all mutable references have been dropped
+     foo.x = 7;
+    
+     //Move ownership of foo into a function
+     do_something(foo);
+}
+
+
+//ownership transfer of structs-
+struct Bar {
+    x: i32,
+}
+
+struct Foo {
+    bar: Bar,
+}
+
+fn main() {
+    let foo = Foo { bar: Bar { x: 42 } };
+    println!("{}", foo.bar.x);
+    // foo dropped first
+    // foo.bar dropped second
+}
+
+
+
+//Slices-
+fn main() {
+     let s: String = String::from("hello, hackquest.");
+
+     // Starting from 0, .. represents one or more indexes
+     let slice1: &str = &s[0..2];
+     //The default also starts from 0
+     let slice2: &str = &s[..2];
+
+     let len: usize = s.len();
+     // Contains the last byte. Since the index of the last byte is (len-1), the [4..len] method just contains the (len-1)th byte.
+     let slice3: &str = &s[4..len];
+     //Default to the last byte
+     let slice4: &str = &s[4..];
+
+     // Get a slice of the entire string
+     let slice5: &str = &s[0..len];
+     // Same as above
+     let slice6: &str = &s[..];
+}
+String slice indexing is based on bytes, not characters. Therefore, the index must correspond to a complete boundary of a Chinese character; otherwise, obtaining that character will fail.
+
+
+String Literals -
+- They are hardcoded into the final program binary, have the type &str, similar to the dynamic string slices 
+- serve as references to statically allocated string data within the program binary, also known as static string slices.
+- msg! macro is used to print msgs in program
+
+//string literal- let x: &str = "abhi";,
+//dynamic string - let x: String = String::from("abhi");
+//string slice = let y: &str = &x[..];
+//dynamic string to string literal - let z: &str = x.as_str()
+//Convert string literal to dynamic string type
+let s4: String = "hello,world".to_string();
+let s5: String = String::from("hello,world");
+
+
+1.String slices and 2. string literal -
+1.- dynamically sized,
+    depend on the lifetime of the referencing variable,
+2. - size is fixed at compile time
+    hardcoded into the binary of the program
+
+Both are references to string data rather than the actual string data itself.
+② Both are UTF-8 encoded strings. 
+③ Both can use similar string operations, such as slicing, searching, comparing, etc
+
+UTF-8 -> 4bytes of space, Rust-> 1..4 bytes of space for chars,  1ASCII- 1 byte of space, 1chinese char- 3bytes of space, slicing happens byte wise and not character wise
+
+String methods-
+let mut s: String = String::from("abhi")
+replace -s.replace("abhi", "Abhi"), -creates another str
+pop- s.pop() -modifies original str, 
+slice -s[..4], 
+push_str -> append a string -s.push_str("Dash"),
+push -> append a char 
+insert- s.insert(0, '!'), 
+
+
+difference between bytes, characters, and strings-
+bytes- unit of length and occupy 8 bits in the computer
+chars- single characters in text
+strings- sequences of characters,
+
+Tuple- 
+let tup: (i32, f64, u8, &str) = (100, 1.1, 1, "This is a tuple");
+// Deconstruct the tup variable and bind the second element to the variable x
+let (_, x, ..) = tup;
+
+let first = tup.0;
+let second = tup.1;
+
+
+Tuple structs-
+struct Color(i32, i32, i32);
+
+
+Enum- handles null circumstances
+// It has two enum values, Some(T): Contains a specific value T, and None: Represents no value.
+enum Option<T> {
+    None,
+    Some(T),
+}
+
+{:p} -> memory address
+{:?} -> debug mode
+
+
+Arrays- static array, dynamic Vectors
+arrays type -[dataType; length]
+let b: [String; 3] = std::array::from_fn(|_i| String::from("rust")); // b = ["rust","rust","rust"]
+let arrays: [[u8; 5]; 2] = [a, c];, let a :[u8; 5] = [3; 5], let c: [u8 ;5] = [9, 8, 7, 6, 5]
+
+
+
+Vector-
+Dynamic array, can have multiple data types, supporting size adjustments at runtime.
+Syntax-
+let v1: Vec<i32> = Vec::new();
+let mut v2: Vec<i32> = Vec::new();
+v2.push(1);
+let v3 : Vec<i32> = Vec::from([0,0,0]);
+let v4 = vec![0; 3];
+assert_eq!(v3, v4);
+let v5 = vec![1,2,3,4]
+
+
+///dbt-
+let mut v7 = vec!([1,2,3,4,5]);
+printlnl!("{:p}", &v7[0]);
+println!("capacity", v7.capacity()); 
+match v7.get(0) {
+    Some(1) => println!(),
+    None => println!(),
+}
+v7.push(7); //while adding new value, the old vec goes out of the heap and a new vec is formed with 2x the og sie and the new element is added
+println!("capacity", v7.capacity());
+
+
+HashMaps -
+use::collections::HashMap
+let mut h1 = HashMap::new() //dynamic size
+h1.insert("Alice", 100);
+
+//fixed size-
+let mut h2 = HashMap::with_capacity(3);
+h2.insert("Alice", 100);
+h2.insert("Bob", 99);
+h2.insert("Eve", 59);
+
+let user_list: Vec<(&str, i32)> = vec![("Alice", 10000),
+         ("Bob", 1000),
+         ("Eve", 100),
+         ("Mallory", 10),
+        ]
+let mut user_map: HashMap<&str, i32> = user_list.into_iter().collect();
+println!("{:?}", user_map);
+let alice_balance = user_map["Alice"];
+println!("{:?}", alice_balance);
+
+let alice_balance: Option<i32> = user_map.get("Alice");
+println!("{:?}", alice_balance);
+
+let old = user_map.insert("Alice", 20000);
+assert_eq!(old, Some(10000));
+
+let v1 = user_map.entry("Abhi").or_insert(1) //gives reference to the old value or inserts the default value and gives reference to it
