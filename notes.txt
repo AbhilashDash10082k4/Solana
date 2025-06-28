@@ -1,0 +1,213 @@
+Solana employs a combination of Proof of History (PoH) and Proof of Stake (PoS) to achieve transaction processing speeds of thousands per second. PoH, a unique and innovative mechanism, records and verifies timestamps and order of blocks. By introducing time proofs in each block, PoH allows nodes to quickly reach consensus without waiting for confirmation from the entire network. Solana's PoS mechanism is utilized for validator selection. Validators participate in network validation by staking a certain amount of tokens. Validators with more tokens have a higher chance of being chosen to generate new blocks and validate transactions. Thus, PoH ensures block timestamps and order, while PoS ensures network security and resistance to attacks, making Solana suitable for high-performance decentralized applications and high-frequency trading scenarios.
+
+everything is an account, resembling a container (or a folder in a computer) that can hold program code, state data, and account metadata. Functionally categorized into executable accounts and data accounts, executable accounts store program code and are also known as program accounts. Data accounts include regular user accounts and other non-program accounts storing user balances, transaction history, and related data, without containing program code. While this account categorization might seem unusual for those familiar with Ethereum accounts, a deeper understanding reveals that Solana's single-account model enables parallel processing of multiple transactions, forming the foundation for Solana's high performance.
+
+Proof of History (PoH) consensus mechanism utilizes the SHA-256 hash function, a secure hash algorithm that transforms arbitrary-length input (message) into a fixed-length output. Properties of hash func-
+
+1.same input = same output to maintain consistency
+2. Unique input = unique output
+3. Change in input = significant change in o/0
+4. Hash fn output irrev to input
+
+POH MECH - input- fn hash- o/p -fb hash -o/p2- fn hash-o/p 3...
+No. Of fn execns and results are stored which make the POH chain and are bundled to form a block, 
+Sequential running of fn- each run is represented by an index, hash count and event 
+info are stored , order of hashes=no of iterations and event info
+
+new block is generated, we can slice the block's data and structure and parallelize the verification on multiple GPU cores. After verification, it will be broadcasted on the Solana network. Due to the chronological order of blocks and consistent time clocks in each node, we can easily verify the validity of blocks and determine their order.
+
+
+Leaders and validators-
+Solana employs a Proof of Stake (PoS) mechanism in choosing Validators, where stakers participate in network transaction verification by staking a certain amount of tokens. Validators with more tokens staked have a higher chance of being selected to generate new blocks.
+
+PoS Mech - 
+1. clients -> txn to Leaders or nodes that are eventually picked up by Leaders ->
+2. Leaders process these pending txns, orders them and send them to Validators
+3. Each Leader publishes the local state after sending some N txns to Validators
+4. Validators match these states -> and give +ve /-ve message
+5. +ve msg for the txns which are equal in validator and leader node
+6. if +ve msg is sent for 2/3rd of the total txns, the prev txn gets finalized and this is like acheiveing final confirmation for block
+
+At the beginning of each new Epoch cycle, the Solana network selects Leaders based on the staking weights of each node, forming a rotation list of block producers, "designating" the future block producers at different times. In other words, block producers are informed in advance that they will be block producers.
+Factors for chosing a leader by validators - 
+1.
+Amount of staked tokens: The quantity of staked tokens is a crucial consideration in PoS. Validators typically prefer nodes with larger staked amounts, increasing the chances of a node being selected as a block producer. This also helps ensure that the network is maintained by nodes with sufficient vested interest.
+2.
+Node performance: Node performance is another key factor. High-performance nodes can verify and package transactions more quickly, contributing to maintaining a high throughput network. Validators may choose nodes with better performance to enhance overall network efficiency.
+3.
+Network latency: Validators may consider network latency between nodes. Opting for nodes with lower network latency helps reduce block propagation time, enhancing network real-time performance.
+4.
+Node availability: Validators focus on node availability, ensuring stable operation without easy susceptibility to faults. Reliable nodes can provide more stable services to the network.
+The goal of Leaders is to select a suitable set of transactions, ensuring network security, efficiency, and fairness. By comprehensively considering these factors, Solana can make optimal block-producing decisions, driving the network's normal operation.
+
+Epoch - 2-4 days, 432000 Slots, 1 Slots = 2-4 sec (block timing), each 4 slot - Block producing cycle
+Leader nodes undergo a achange in every 4Slots cycle
+
+Block creation proc by poh nd pos-
+1. txn to leaders by users
+2. Txn hashes linked to PoH chain - txns are sorted
+3. validating the txn by validators and pushing it ot appr block
+4. PoH chains are packed into block and are published to the chain
+5. the other nodes validate the new block and then add them to the network
+
+
+Accounts -
+EOA - externally owned accnts - do not have associated executable accnt, handled by pvt key, can send txns, send txns for contract executn, 
+contract accnt - Contract account contain contract code. 
+They are created by external owned account or other contracts. 
+Contracts, when created, are automatically assigned to an account address used for storing contract code and any storage data generated during contract deployment or execution. 
+The address of a contract account is generated through the SHA3 hashing algorithm and not a private key.
+ As it lacks a private key, a contract account cannot be used as an external owned account. Contract execution and code invocation are only possible through an external owned account.
+
+Solana acnts -
+Program accnt- contract - executable, stateless, read only, stoes code and no state
+Data accnt - stores data of runtime of program accnt, is owned by a program accnt and the program accnt can make Changes in data accnt
+
+Fees -
+Rent -fees paid to store data on the network . If an account cannot afford the rent, the system deletes that account to reduce storage costs for data that is no longer maintained. An account can be exempted from paying rent if the assets in the account exceed the minimum balance for two years' rent. The rent storage cost on Solana is 0.00000348 SOL per byte, and a typical wallet data size is 372 bytes/year, requiring every active wallet holder to maintain 0.0026 SOL.
+
+Types of Accnts -
+
+User Account: Regular wallet users, similar to Ethereum's External Owned Account (EOA).
+●
+Program Account: Accounts that execute specific tasks, storing the program's binary file. We'll explore this further in upcoming sections.
+●
+PDA (Program Derived Addresses) : These accounts store the program's state, i.e., data stored during program execution. It's a concept similar to Ethereum's state, but here, it's split into individual accounts. A dedicated section will cover this in the next part.
+●
+ATA (Associated Token Account) Accounts: These are accounts associated with specific SPL (Solana Program Library) token, allowing users to conveniently manage the tokens they hold.
+
+PDA- Program Derive Accnt-
+pub struct Account {
+  /// Balance
+  pub lamports: u64,
+  pub data: Vec<u8>,
+  pub owner: Pubkey,
+  /// Whether it's an executable account
+  pub executable: bool,
+  /// Next epoch for rent collection
+  pub rent_epoch: Epoch,
+}
+
+●
+lamports: Represents the account balance. Lamport is the basic currency unit in Solana, similar to Ethereum's wei.
+●
+data: Represents the stored content, which is a byte array that can contain any type of data, such as program state, user asset information, and the bytecode of a stored program.
+●
+owner: Indicates the public key of the program that owns or manages the account. It signifies which program has the right to operate on the account. If the account contains executable data, the owner represents the program that loads the account.
+●
+executable: Indicates whether the account is executable. If true, it means the data in the account can be executed, making it a program account. If false, the account is used to store regular data, not executable code.
+●
+rent_epoch: Represents the next period when rent will be deducted from the account. Solana uses the rent mechanism to prevent accounts from being indefinitely occupied without use, avoiding state bloat.
+
+
+
+PDA- program derived address - address generated by Program accnts which allows them to own/maintain some data without the need for traditional private key signatures.
+- mnemonic phrase -> pvt key -pub key(address for a prog -> program_id ) -> but reverse is not possible. (ECDSA Algo) -> pvt keys are used to sign the txns.
+- PDA - an address without corresponding pvt_key -> derived from pub_key(program_id) and seed. If in any case this pub_key has an associated pvt_key, another pub_key(program_id) is generated by adding a no. outside the program_id and seed. This is known as bump. This number starts from 255 and decreases until we generate a public key with no corresponding private key.
+
+Why PDA?-
+you need a private key to prove ownership of a public key. You can sign and authorize transfer requests for the account using this private key. However, if the account is owned by a decentralized program instead of an individual, placing the private key on chain is not a good idea. Since all program code is public on the chain, if everyone can see your private key, malicious operations, such as stealing your tokens, can occur. This is where a PDA without a private key comes in handy. In this way, the program can sign an address without needing a private key.
+
+generate a PDA-
+pub struct InitializeAccounts<'info> {
+		#[account(
+			init,
+			seeds = [b"my_seed",
+							 user.key.to_bytes().as_ref()
+							]
+			bump,
+			payer = user,
+			space = 8 + 8
+		)]
+		pub pda_counter: Account<'info, Counter>,
+}
+pda_counter- represents the PDA account to be generated.
+bump- no. added outside the seed and program_id to generate a program_id without pvt_key
+seesd- any byte array set according to the business scenario. 
+Anchor automatically uses the first bump value that meets the conditions, so there's no need for manual specification. Internally, Anchor also automatically retrieves the program_id
+payer - txn initialization fee payer
+space- first 8 bytes store the discriminator added automatically by Anchor to identify the account type. The next 8 bytes allocate space for the data stored in the Counter account type (count is of type u64, occupying 8 bytes). 
+
+
+
+Programs - Smart Contracts( SCs ) - onchain activities
+1. onchain programs - user-written programs deployed on Solana, developed by developers for specific business scenarios on the Solana network. upgraded with upgrade permissions, typically held by the account that deployed the program or other specified accounts.
+
+2. Native programs -integrated into the system -,only be upgraded through software updates within the network.
+native programs include the System Program(responsible for managing the creation of new accounts and transferring SOL between two accounts.), BPF Loader Program, Vote program, and Solana Program Libraries - SPL(  define a series of on-chain activities, including token creation, exchange, lending, creating staking pools, maintaining on-chain domain name resolution services, and more. ).
+
+Features - separation into -
+- program accnt( code executn, stateless ) and 
+- data accnt( stores data for program accnts and is pased as reference to program accnt, owned by the program accnt)
+
+
+Since state data is stored as accounts on the network, it can be conveniently sharded and processed in parallel, leading to increased throughput and efficiency in the Solana network.
+// Importing dependencies for Solana programs
+use solana_program::{
+    account_info::AccountInfo,
+    entrypoint,
+    entrypoint::ProgramResult,
+    pubkey::Pubkey,
+    msg
+};
+
+// Program entry point
+entrypoint!(process_instruction); //entry point for program , as main in Rust
+
+// Instruction processing logic
+pub fn process_instruction(
+    program_id: &Pubkey, //public key
+    accounts: &[AccountInfo], // referencing to an array of AccountInfo
+    instruction_data: &[u8] //a byte array, representing the parameters required for the instruction.
+) -> ProgramResult{
+    msg!("Hello, world!");
+
+    Ok(())
+}
+
+
+Transactions -
+- transferring tokens, invoking programs, and updating account status.
+- transaction has a unique signature and is composed of one or more instructions. Transaction fees are typically paid using Solana's native token, SOL.
+- txn signed by pvt key of 1 or more accnts
+- Instruction-
+  - is a specific command that contains all the necessary data for its execution.
+  - e.g -program's unique identifier (program_id), a list of accounts, instruction parameters, configuration information, etc., required to perform a specific operation.
+
+-  transaction called while initiating a transfer, calling a program. Txns include - instructions, block hash, signatures( Signatures of the initiator corresponding to the instructions. )
+- instructions -
+  - smallest units of a txn
+  - A transaction can package multiple instructions, specifying which program to call, which accounts to read or modify, and providing any additional data required for program execution.
+  - components of a transfer txn -( transfering of SOL ) -
+    - Compute Budget - Set Compute Unit price ( price of a single CU. )
+    - Compute Budget - Set Compute Unit Limit (maximum number of CUs that can be consumed.)
+    - SOL transfer -( Execute a token transfer.)
+
+
+Txn Fees -  Compute Unit-
+- The following operations generate Compute units:
+● Executing SBF instructions
+● Passing data between programs
+● Invoking system calls
+● Logging
+● Creating program addresses
+● Cross-program invocation
+
+1 SOL = 1000,000,000 lamports
+For a transfer txn -
+CU price -50000 lamports 
+CU limit - 200000 Compute units
+
+Main states of a txn based on the lvl of confirmation on Solana Chain-
+  - 'processed': The latest block confirmed once by querying connected nodes.
+  - 'confirmed': The latest block confirmed once by querying the cluster.
+  - 'finalized': The latest block completed by the cluster.
+
+KeyPair-
+pvt key and pub_key -> asymmetric encryption, pvt_key <---> pub_key for decryption
+pub_key  -> program_id -> address for the program
+Due to the low readability of addresses, domain systems can be used, such as using example.sol to point to an address like dDCQNnDmNbFVi8cQhKAgXhyhXeJ625tvwsunRyRc7c8, making the address more identifiable.
+
+Private keys are used to authenticate the permissions of the key pair. If you possess the private key for a certain address, you have control over the tokens within that address
+
+Wallet -
