@@ -1,0 +1,147 @@
+//largest
+fn largest (list: &[i32]) -> i32 {
+    let mut greatest = list[0];
+    for item in list {
+        if item > greatest {
+            greatest = item;
+        }
+    }
+    greatest
+}
+
+//same with generics, for comparision, PartialOrd type is used, for moving the list[0]
+to largest, Copy type is used 
+fn largest <T: PartialOrd +Copy>(list: &[T]) -> T {
+    let mut greatest = list[0];
+    for &item in list.iter() { //as iter , so &, if into_iter() then we could have directly transferred the ownership
+        if item > greatest {
+            greatest = item;
+        }
+    }
+    greatest
+}
+//where Syntax
+fn largest<T> (list: &[T]) -> T
+where T: PartialOrd +Copy,
+{...}
+fn main() {
+    let arr1: &[i32; 3] = [1,2,3];
+    println!("{}",largest(arr1)); 
+}
+
+
+//generics with enums, structs
+struct Point1<T> {
+    x: T,
+    y: T
+}
+struct Point2<T,U> {
+    x: T,
+    y: U,
+}
+enum Option<T> {
+    Some(T),
+    None,
+}
+impl <T> Point1 <T> {
+    fn something(&self) ->&T {
+        &self.x
+    }
+}
+fn main() {
+    // 1. Use generics in structures
+     let int_point = Point1 { x: 5, y: 10 };
+     let float_point = Point1 { x: 1.0, y: 4.0 };
+
+     // 2. Use generics in structures
+     let p = Point2{x: 1, y:1.1};
+
+     // 3. Use generics in enumerations
+     let option1 = Option::Some(1_i32);
+     let option2 = Option::Some(1.00_f64);
+
+     // 4. Use generics in methods
+     let x = int_point.get_x();
+}
+
+
+
+//traits-
+trait MigrantBird  {
+    fn migrate (&self) -> String;
+}
+trait MigrantBird2 {
+    fn migrate_2(&self) -> String {
+        "swallow fly fast, but have to rest frequently".to_string()
+    }
+}
+struct WildGoose  {
+    color: string,
+}
+impl MigrantBird for WildGoose  { //implementation of trait for struct
+    fn migrate(&self) -> Stirng {
+        "Geese fly in a V-shaped formation".to_string();
+    }
+}
+impl MigrantBird for Swallow {
+    fn migrate(&self) -> String {
+        "swallow fly fast, but have to rest frequently".to_string()
+    }
+}
+fn main() {
+    let bird1 = WildGoose {color: "grey".to_string()};
+}
+
+
+//default implementation-
+impl MigrantBird2 for WildGoose {}
+fn main() {
+    let bird1 = WildGoose {colr: "black".to_string()};
+    bird1.migrate_2();
+}
+
+
+monomorphization-
+if a fn is used for multiple types by specifying a generic, during compile time, Rust compiles the same fn as many times as according to the traits. This is same as writing repititve code for each type. The code's execution efficiency is similar to hand-writing repetitive code for each specific definition. This monomorphization process is why Rust generics are highly efficient at runtime.
+
+
+// Function with Trait as a parameter
+fn fly(item: impl MigrantBird) {
+    println!("I am flying to the warm south");
+}
+//implement it using a Trait bound. This way, only parameters of type MigrantBird can call the function. In other words, we restrict the generic type of the parameter to be of type MigrantBird.
+fn fly<T: MigrantBird>(item: T) {
+		println!("i am flying to the warm south");
+}
+
+
+compile time - code -> executable
+runtime -> executable code runs
+
+
+//types-
+trait Summary {
+    type Output;
+
+    fn summarize (&self) -> Option<Self:: Output>
+}
+struct NewsArticle {
+     headline: String,
+     location: String,
+     author: String,
+}
+impl Summary for NewsArticle {
+    type Output = String;
+    fn summarize (&self) -> String {
+        format!("{},{},{}", self.headline,self.location, self.author)
+    }
+}
+fn main() {
+     let article = NewsArticle {
+         headline: String::from("Penguins win the Stanley Cup Championship!"),
+         location: String::from("Pittsburgh, PA, USA"),
+         author: String::from("Iceburgh"),
+     };
+
+     println!("{}", article.summarize());
+}
