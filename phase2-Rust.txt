@@ -381,7 +381,9 @@ enum Option<T> {
 Arrays- static array, dynamic Vectors
 arrays type -[dataType; length]
 let b: [String; 3] = std::array::from_fn(|_i| String::from("rust")); // b = ["rust","rust","rust"]
-let arrays: [[u8; 5]; 2] = [a, c];, let a :[u8; 5] = [3; 5], let c: [u8 ;5] = [9, 8, 7, 6, 5]
+let arrays: [[u8; 5]; 2] = [a, c];,
+let a :[u8; 5] = [3; 5],
+let c: [u8 ;5] = [9, 8, 7, 6, 5]
 
 
 

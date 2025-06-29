@@ -1,0 +1,178 @@
+if else, for, while, loop
+if condition=true {
+
+} else {
+
+}
+for i in 1..=7 {
+
+}
+let mut m =1;
+while condition {
+    m += 1;
+}
+
+let mut n = 1;
+loop {
+    println!("{}!!", n);
+        n = n + 1;
+        if n > 5 {
+            break;
+        }
+}
+
+
+//ownership in for loop-
+let v: Vec<i32> = vec![1,2,3,4];
+for item in v.into_iter() {
+    println!("{}",item); //ownership has been moved into here
+}
+println!("{:?}", v); //error
+
+for item in &v {
+    println!("{}",item); //ownership has been moved into here
+}
+println!("{:?}", v); //ownership is still there
+
+
+2. Loop skipping and interruption
+     for item in 1..=5 {
+         if item == 2 {
+             // Skip this loop and enter the next loop
+             continue;
+         }
+
+         if item == 4 {
+             // Break the entire loop
+             break;
+         }
+         println!("this Item is : {}", item);
+}
+
+let arr: [i32; 5] = [1,2,3,3,4];
+for i in arr.iter() {
+    println!("{}", i);
+}
+
+let mut counter = 0;
+     let result = loop {
+         counter += 1;
+         if counter == 10 {
+             // When the condition is met, break will interrupt the loop and return the value of counter * 2
+             break counter * 2
+         }
+     };
+     println!("The result is {}", result);
+
+
+
+Calculating area of shapes
+
+enum Shape {
+    Circle(f64),
+    Sqaure(f64),
+}
+fn calc_area (shape: &Shape) -> f64 {
+    match shape{
+        Shape::Circle(radius) => std::f64::consts::PI *radius*radius,
+        Shape::Square(side) => side*side
+    }
+}
+struct Point {
+    x: i32,
+    y: i32,
+}
+fn process_pnt (pnt: Point) {
+    match pnt {
+        Point {x:0, y: 0} => println!("origin"),
+        Point {x , y} => println!("{}, {}", x,y),
+    }
+}
+fn main() {
+    let circle = Shape::Circle(7,0);
+    let square = Shape::Square(7.0);
+    println!("{}", cal_area(&circle));
+    println!("{}", cal_area(&square));
+
+    //match pattern for assignment
+    let circleArea = match circle {
+        Shape::Circle(r) => std::f64::consts::PI *r*r,
+        Shape::Square(s) => s*s,
+    }
+    println!("{}", circleArea);
+
+    //Point matching
+    let p1 = Point {x: 1, y:2};
+    let p2 = Point {x:3, y:7};
+    process_pnt(p1);
+    process_pnt(p2);
+
+    //if let
+    let some_u8_val = Some(3u8);
+    match some_u8_val {
+        Some(3) => println!(3),
+        _ => println(".."), //handles any case except 3
+    }
+}
+
+
+//Methods-
+struct Rect {
+    h: i32,
+    w: i32,
+}
+impl Rect {
+    fn area (&self) -> i32 {
+        self.w *self.h
+    }
+}
+fn main() {
+    let rect = Rect {h:7, w:7};
+    println!("area, {}", rect.area())
+}
+
+
+//impl method as an associating fn-
+struct Square {
+    s: i32,
+}
+impl Square {
+    fn area(&self) -> i32 {
+        Square.s * Square.s
+    }
+
+    //associating fn
+    fn new(side: i32) -> Self {
+        Square {s}
+    }
+}
+fn main() {
+    let sq = Square::new(9);
+    println!("Area {}", sq.area());
+}
+
+Methods are associated with specific types (structs, enums, traits, etc.), defined within an impl block for that type, and always have &self as the first parameter, representing the instance on which the method is called. They are invoked using the dot operator, similar to object methods in object-oriented languages.Functions are independent and not tied to any specific type. They can be defined anywhere, have no self parameter, as they are not associated with any particular instance, and are called directly using the function name.
+
+//methods on enum
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+impl Message {
+    fn call (&self) {
+        match &self {
+            Message::Quit => println!("退出"),
+            Message::Move { x, y } => println!("移动到({},{})", x, y),
+            Message::Write(text) => println!("写入{}", text),
+            Message::ChangeColor(r, g, b) => println!("改变颜色为({}, {}, {})", r, g, b),
+        }
+    }
+}
+fn main(){
+    let m = Message::Move {x:7, y:2};
+    m.call();
+    let n = Message::Write(String::from("abhi"));
+    n.call();
+}
