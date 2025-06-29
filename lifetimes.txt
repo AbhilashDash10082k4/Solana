@@ -1,0 +1,32 @@
+The value of the lender should be more than the borrower
+//without lifetimes -
+fn largest(x: &str, y: &str) -> &str {
+    if x.len() > y.len() {
+        x
+    }else {
+        y
+    }
+}
+
+//with lifetimes annotations-
+fn largest<' a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    }else {
+        y
+    }
+}
+
+// After the structure name + angle brackets to mark the life cycle
+struct MyEnum<'a> {
+         // Attribute fields use the lifetime marked in the enumeration 'a
+         // This means that the lifetime of the greet reference must be greater than the enumeration instance, otherwise an invalid reference will occur
+     greet: &'a str,
+}
+
+
+fn main() {
+     let hello = String::from("hello, hackquest");
+         // The life cycle of the reference is greater than the structure instance, so it can be compiled normally
+     let i = MyEnum { greet: &hello };
+}
