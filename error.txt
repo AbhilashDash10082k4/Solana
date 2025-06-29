@@ -1,0 +1,64 @@
+enum Result<T,E> {
+    Ok(T),
+    Err(E),
+}
+
+Result -recoverable, Panic- unrecoverable
+
+match divide(7,0) {
+    Result::Ok(result) => ,
+    Result::Err(err) => ,
+}
+fn divide(x: i32, y:i32) {
+    if y == 0{
+        Err(String::from("in divisible"))
+    }else {
+        Ok(x/y)
+    }
+}
+
+panic!("This is a panic situation!");
+
+//Reading a file in rust
+
+use std::fs::File;
+use std::io::(self, Read);
+fn read_file(file_path: &str) -> Result<String, io::Error> {
+    let mut my_file = File::open(file_path)?; //? -returns result else Err(err)
+    let mut contents = String::new();
+    my_file.read_file_string(&mut contents)?;
+    Ok(contents)
+}
+fn main() {
+    let file_contents = read_file("notes.txt");
+    match file_contents {
+        Ok(res) => println!("{}", res),
+        Err(err) => println!("{}", err)
+    }
+}
+
+
+//error propagation-
+use std::io;
+use std::fs::File;
+use std::io::Read;
+
+fn read_file(file_path : &str) -> Result<String, io::Error> {
+    let mut my_file: Result<File, io::Error> = File::open(file_path);
+    let mut file = match my_file {
+        Ok(my_file) => my_file,
+        Err(err) => return err,
+    }
+    let mut contents = String::new();
+    let read_content = file.read_to_string(contents);
+    match read_content {
+        Ok(_) => Ok(contents),
+        Err(err) => return err,
+    }
+}
+fn main() {
+    match read_file("notes.txt") {
+        Ok(res) => println!("{}", res),
+        Err(err) => println!("{}", err)
+    }
+}
