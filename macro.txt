@@ -1,0 +1,277 @@
+Macro is a tool for metaprogramming that allows developers to write code that generates other code, enhancing code flexibility and reusability. For a more detailed explanation,Macros in Rust are divided into two main types:
+
+Declarative Macros (macro_rules!) allow developers to create pattern matching and replacement rules using macro rules. It replaces code based on matched patterns. Declarative macros are text-based macros, involving simple text replacement without manipulating the abstract syntax tree (AST).
+
+Procedural Macros enable developers to use Rust code to process input and generate output during the code generation phase. Unlike declarative macros, procedural macros are more powerful and flexible, coming in three main types: derive macros, attribute-like macros, and function-like macros.
+
+AST (Abstract Syntax Tree): Rust source code is parsed into lexical units (Tokens) by the compiler, further forming a tree-like structure where each node represents a syntax element such as expressions, statements, function declarations, etc. The tree structure reflects the nesting and hierarchical relationships in the source code.
+
+// Logging macro: println!
+println!("hello, micro");
+
+// Dynamic array creation macro: vec!
+let _dyn_arr = vec![1, 2, 3];
+
+// Assertion macro: assert!, checks if a condition is satisfied
+let x = 1;
+let y = 2;
+assert!(x + y == 3, "x + y should equal 3");
+
+// String formatting macro: format!
+let name = "world";
+let _message = format!("Hello, {}!", name);
+
+
+//declarative macro e.g-
+macro_rules! double {
+    ($x:expr) =>{
+        $x*2 //replace the text and double it
+    };
+}
+fn main() {
+    let double_val = double!(5); //double_val == 10
+}
+
+fns vs macros-
+fns -runtime tools -executed at runtime
+macros - compile time tools- compile and expand the code and generates new code during compile time. macros offer more opportunities for optimization and checks during compilation, enhancing program performance and safety.
+
+macros can accept any number and type of parameters and generate code of any type during compilation. This flexibility allows macros to be versatile, suitable for various scenarios. For example, macros can be used to generate data structures, define domain-specific languages, or implement code templates.
+
+to_uppercase-
+
+fn to_upper_case (s: &Str) -> String {
+    s.to_uppercase()
+}
+fn main() {
+    let upper_case = to_upper_case("abhi");
+    println!("{}",upper_case);
+}
+
+//macro versn-, this directly implements to_uppercase without calling to_upper_case like the fn
+macro_rules! to_upper_case {
+    ($x: expr) =>{
+        $x.to_uppercase()
+    };
+}
+fn main() {
+    let big_case = to_upper_case!("abhi");
+    println!("{}",big_case);
+}
+
+
+//Declarative macros are text-based, involving simple text replacement without manipulating the abstract syntax tree (AST).
+create pattern matching and replacement rules using macro rules (macro_rules!), replacing code based on matched patterns.
+
+//adding 2 nos. -this does not cal sum of 2 nos (by calling a fn) but directly adds them
+macro_rules! sum {
+    ($x:expr, $y:expr, $typ: ty) => {
+        $x as $typ + $y as $typ
+    };
+}
+fn main() {
+    let add = sum!(1,6, i32);
+    println!("{}", add);
+}
+
+// Expanded code of the macro
+fn main() {
+	{
+		1 + 2
+	}
+}
+
+
+//vec! macro impl-
+macro_rules! vec {
+    ( $( $x: expr ), * ) => { //($(something), *)- repeated multiple times
+        let temp = Vec::new();
+        $(
+            temp.push($x);
+        )*
+        temp_vec
+    }
+}
+//The expanded code is as follows
+let v = {
+     let mut temp_vec = Vec::new();
+     temp_vec.push(1);
+     temp_vec.push(2);
+     temp_vec.push(3);
+     temp_vec
+}
+
+
+tokens-
+parameters starting with $ and followed by : denote the type of the parameter. The type of parameter is commonly referred to as Token. Common Token types in Rust are:
+●
+Expression (expr): Represents an expression in Rust code, e.g., x + y, if condition { true } else { false }, etc. Numbers are also a type of expression.
+●
+Statement (stmt): Represents a statement in Rust code, e.g., let x = 1;, println!("Hello, world!");, etc.
+●
+Type (ty): Represents a type in Rust code, e.g., i32, bool, String, etc.
+●
+Identifier (ident): Represents an identifier in Rust code, e.g., variable names, function names, struct names, etc.
+●
+General Token (tt): Represents any Token in Rust code and can be used to match and generate Tokens of any type.
+
+
+macro_rules! add{
+    // Match a single parameter
+    ($a:expr)=>{
+       $a
+    };
+   // Match 2 parameters
+    ($a:expr,$b:expr)=>{
+       {
+           $a+$b
+       }
+    };
+   // Recursive call
+    ($a:expr,$($b:tt)*)=>{
+        {
+            $a+add!($($b)*)
+        }
+    }
+}
+
+fn main() {
+    println!("{}", add!(1, 2, 3, 4));
+}
+
+
+//derive macro -procedural type
+The three types of procedural macros mentioned earlier (derive macros, attribute macros, and function macros) work similarly: they take Rust source code as input, perform a series of operations based on the code, and then output a completely new piece of code.
+
+use proc_macro::TokenStream;
+#[derive[CustomMacro]]
+pub fn custom_mac_derive(input: TokenStream) -> TokenStream { ////input -enum, struct, union
+    TokenStream::new()
+}
+fn main() {
+
+}
+
+
+
+struct Foo { x: i32, y: i32 }
+
+// Method one
+impl Copy for Foo { ... }
+impl Clone for Foo { ... }
+impl Ord for Foo { ... }
+impl PartialOrd for Foo { ... }
+impl Eq for Foo { ... }
+impl PartialEq for Foo { ... }
+impl Debug for Foo { ... }
+impl Hash for Foo { ... }
+
+// Method two
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Debug, Hash, Default)]
+struct Foo { x: i32, y: i32 }
+
+fn proc_macro::TokenStream
+
+
+
+//new way of impl traits-
+trait HelloMacro {
+    fn hello()
+}
+struct My_Struct;
+impl HelloMacro for My_Struct {
+    fn hello() {
+        println!("My_Struct");
+    }
+}
+struct Ur_Struct;
+impl HelloMacro for Ur_Struct {
+    fn hello() {
+        println!("Ur_Struct");
+    }
+}
+struct Abhi{
+    name: string;
+}
+impl HelloMacro for Abhi {
+    fn hello() {
+        println!("Abhi");
+    }
+}
+fn main() {
+    Ur_Struct::hello;
+    My_Struct::hello;
+
+    //another way -
+    let name_abhi = Abhi {name: String::from("abhilash")};
+    name_abhi.hello();
+}
+
+
+
+//using derive -> take i/p , process and o/p Rust code - metaprogramming
+//TokenStream is a sequence of Tokens, representing a piece of parsed and processed code during macro expansion.
+
+// It consists of multiple Tokens, forming a code snippet. In macros, you typically receive a TokenStream as input, manipulate the Tokens within it, and then generate a new TokenStream as output. This allows code generation or transformation at compile time.
+
+extern crate proc_macro;
+use proc_macro::TokenStream;
+use syn;
+use syn::Derive;
+
+#[proc_macro_derive(HelloMacro)] //takes proc_macro_derive as HelloMacro
+fn fn_1(input: TokenStream) ->TokenStream {
+    let ast : DeriveInput = syn::parse(input).unwrap();
+    fn_2(&ast)
+}
+
+fn fn_2(ast: &syn::DeriveInput) -> TokenStream {
+    let name_struct = ast.ident(); //ident-identifier;
+    let gen = quote! { //output code from DeriveInput
+            impl HelloMacro for #name {
+                fn hello() {
+                    println!("{}", stringify!(#name));
+                }
+            }
+    }
+    gen.into(); //to transform the output to TokenStream
+}
+struct First_Struct;
+struct Second_Struct;
+fn main() {
+    First_Struct::hello();
+    Second_Struct::hello();
+}
+
+
+
+//attribute-like and function like macros-
+#[attr(...)] -syntax
+
+// Used for selectively including or excluding code based on conditions
+#[cfg(feature = "some_feature")]
+fn conditional_function() {
+    // This function is compiled only when a specific feature is enabled
+}
+
+#[test]
+fn my_test() {
+    // Test function
+}
+
+#[allow(unused_variables)]
+fn unused_variable() {
+    // Allowing unused variables
+}
+
+
+//Fn like macro-
+use proc_macro::TokenStream;
+
+// Specify the macro type here
+#[proc_macro]
+pub fn custom_fn_macro(input: TokenStream) -> TokenStream {
+    input
+}
+
+//As you can see, this is essentially a mapping from one TokenStream to another, where input is the token stream within the invocation delimiters. For example, for the invocation foo!(bar), the input token stream would be bar. The returned token stream will replace the macro invocation.
