@@ -1,0 +1,43 @@
+// src/main.rs
+
+// Main module, equivalent to the hall of the house
+mod living_room {
+     // Submodule, equivalent to the bedroom of the house
+     mod bedroom {
+         // The functions in the module are equivalent to the furniture in the bedroom
+         pub fn sleep() {
+             println!("Sleeping in the bedroom");
+         }
+     }
+
+     // Submodule, equivalent to the kitchen of the house
+     mod kitchen {
+         // The functions in the module are equivalent to the equipment in the kitchen
+         pub fn cook() {
+             println!("Cooking in the kitchen");
+         }
+     }
+
+     // Functions in the main module are equivalent to activities in the lobby
+     pub fn relax() {
+         println!("Relaxing in the living room");
+         bedroom::sleep(); // Call the function in the bedroom module
+         kitchen::cook(); // Call the function in the kitchen module
+     }
+}
+
+// Main function, equivalent to the entrance of the entire house
+fn main() {
+     // Call the function in the living_room module
+     living_room::relax();
+}
+
+
+//module: A unit used to organize and encapsulate code. It can contain functions, structs, enums, constants, traits, and other modules. In Rust, modules are created using the mod keyword, and modules can be nested to form a module tree.
+
+crate: In Rust, it is a compilation unit that can be either a library crate or a binary crate (their differences are explained in the FAQ). A crate can include one or more modules. -node_modules
+
+package: It is a project that contains one or more related crates. Defined by a Cargo.toml file (package.json), it includes metadata about the project, dependencies, and other configuration options. A package may contain a main crate (usually an executable) and zero or more library crates (usually dependencies). -npm packages
+
+
+library crate -reference code and binary crate -executable code(ibnary code)
