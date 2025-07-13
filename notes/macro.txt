@@ -54,6 +54,9 @@ macro_rules! to_upper_case {
         $x.to_uppercase()
     };
 }
+
+//$ -declare a variable in the macro system that will contain the Rust code matching the pattern
+
 fn main() {
     let big_case = to_upper_case!("abhi");
     println!("{}",big_case);
@@ -85,9 +88,9 @@ fn main() {
 //vec! macro impl-
 macro_rules! vec {
     ( $( $x: expr ), * ) => { //($(something), *)- repeated multiple times
-        let temp = Vec::new();
+        let temp_vec = Vec::new();
         $(
-            temp.push($x);
+            temp_vec.push($x);
         )*
         temp_vec
     }
@@ -141,17 +144,26 @@ fn main() {
 
 
 //derive macro -procedural type
-The three types of procedural macros mentioned earlier (derive macros, attribute macros, and function macros) work similarly: they take Rust source code as input, perform a series of operations based on the code, and then output a completely new piece of code.
+The three types of procedural macros (derive macros, attribute macros, and function macros) work similarly: they take Rust source code as input, perform a series of operations based on the code, and then output a completely new piece of code.
+
+some_attribute is a placeholder for using a specific macro variety.The function also has an attribute attached to it that specifies which kind of procedural macro we’re creating
+
+Filename: src/lib.rs
+use proc_macro;
+
+#[some_attribute]
+pub fn some_name(input: TokenStream) -> TokenStream {
+}
+
+
 
 use proc_macro::TokenStream;
-#[derive[CustomMacro]]
+#[proc_macro_derive[CustomMacro]]
 pub fn custom_mac_derive(input: TokenStream) -> TokenStream { ////input -enum, struct, union
     TokenStream::new()
 }
-fn main() {
 
-}
-
+//o/p of procedural macros does not change the original code instead it appends the result to the og code
 
 
 struct Foo { x: i32, y: i32 }
@@ -169,9 +181,6 @@ impl Hash for Foo { ... }
 // Method two
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Debug, Hash, Default)]
 struct Foo { x: i32, y: i32 }
-
-fn proc_macro::TokenStream
-
 
 
 //new way of impl traits-
@@ -217,16 +226,17 @@ fn main() {
 extern crate proc_macro;
 use proc_macro::TokenStream;
 use syn;
-use syn::Derive;
+use syn::DeriveInput;
+use quote::quote
 
 #[proc_macro_derive(HelloMacro)] //takes proc_macro_derive as HelloMacro
-fn fn_1(input: TokenStream) ->TokenStream {
+fn fn_1(input: TokenStream) -> TokenStream {
     let ast : DeriveInput = syn::parse(input).unwrap();
     fn_2(&ast)
 }
 
 fn fn_2(ast: &syn::DeriveInput) -> TokenStream {
-    let name_struct = ast.ident(); //ident-identifier;
+    let name_struct = &ast.ident(); //ident-identifier -> name = name of the struct to be implemented
     let gen = quote! { //output code from DeriveInput
             impl HelloMacro for #name {
                 fn hello() {
@@ -236,13 +246,9 @@ fn fn_2(ast: &syn::DeriveInput) -> TokenStream {
     }
     gen.into(); //to transform the output to TokenStream
 }
-struct First_Struct;
-struct Second_Struct;
-fn main() {
-    First_Struct::hello();
-    Second_Struct::hello();
-}
 
+#[derive(HelloMacro)]
+struct First_Struct;
 
 
 //attribute-like and function like macros-
@@ -275,3 +281,20 @@ pub fn custom_fn_macro(input: TokenStream) -> TokenStream {
 }
 
 //As you can see, this is essentially a mapping from one TokenStream to another, where input is the token stream within the invocation delimiters. For example, for the invocation foo!(bar), the input token stream would be bar. The returned token stream will replace the macro invocation.
+
+
+macro_rules syntax-
+macro_rules! add {
+    ($a:expr, $b:expr, $ty: $typ) {
+        $a as $ty + $b as $ty
+    };
+    {
+        ($a:expr, $($b: $tt)*) {
+            $a + add!( $($b)* )
+        }
+    }
+}
+fn main() {
+    let sum = add!(1,2,i32);
+    println!("{}",sum);
+}

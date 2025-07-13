@@ -1,0 +1,127 @@
+use std::result::Result as ResultGeneric;
+
+//ek saath import-
+use solana_program::{
+    account_info::AccountInfo, //A struct from the account_info module allowing us to access account information.
+    entrypoint, //solana_program=crate, entrypoint=module, A struct from the account_info module allowing us to access account information.
+    entrypoint::ProgramResult, //return value type from the entrypoint module.
+    pubkey::Pubkey, //A struct from the pubkey module allowing us to access addresses as public keys.
+    msg //A macro allowing us to print messages to the program log
+}
+
+pub type ProgramResult = ResultGeneric<(), ProgramError>;
+
+//ProgramError, there are 23 common error reason enum values defined, and it also supports custom error types. Here is an example:
+pub enum ProgramError {
+    #[error("Custom program error: {0:#x}")]
+    Custom(u32),
+
+    #[error("The arguments provided to a program instruction were invalid")]
+    InvalidArgument,
+
+    #[error("An instruction's data contents were invalid")]
+    InvalidInstructionData,
+
+    #[error("An account's data contents were invalid")]
+    InvalidAccountData,
+
+    // ...
+}
+fn process_instruction(
+    instructions_data: &[u8],
+    program_id: &PubKey,
+    accounts: &[AccountInfo], //to extract account info of the user
+) ->ProgramResult {
+
+    //handling the contract accnt logic
+
+    //s1. get the caller accnt
+    //iterating over accnts-
+    let accnts_iter = &mut accounts.iter();
+
+    //getting the caller accnt-
+    let caller_accnt = next_account_info(accnts_iter);
+
+    // s2. Validate the caller's identity, the ownership of the data accnt is given to the current accnt and is verified
+    if caller_accnt.owner != program_id {
+        msg!("Counter account does not have the correct program id");
+        return Err(ProgramError::IncorrectProgramId);
+    }
+    
+    //s3. write into the data accnt -deserialize the CountAccount struct and get a mutable borrow
+    let mut counter = CountAccount::try_from_slice(&caller_accnt.data.borrow())?;
+
+    //CountAccount ->a struct from a data accnt -this is a binary for the program accnt, try_from_slice -> a method from BorshDeserialize trait to deserialize an instance of CountAccount struct from (byte sequence) data accnt to program accnt. &caller_accnt.data.borrow() -borrowable reference of data field from caller_accnt
+
+    //s4 modifying data accnt
+    counter.count += 1;
+    counter.serialize(&mut *account.data.borrow_mut())?;
+
+    //*- derefernce to obtain the val of account.data.borrow_mut() (which is the currently updated value), 
+    the value is mutable referenced so that it can be updated repeatitively , 
+    data.borrow_mut() gives a mutable borrow of data field of accnt ,
+    after changing the val, serialize the struct value into byte array. then write it into the mutable data field of the Solana account -update the field
+}
+
+entrypoint!(process_instruction);
+
+//data account
+//The actual (de)serialization operations are implemented through the BorshSerialize and BorshDeserialize derive macros. The macros' definitions process metadata of Rust code represented as TokenStream and return the processed metadata.
+
+/// Definition of the structure for a data account
+#[derive(BorshSerialize, BorshDeserialize, Debug)] //for structs only derive
+pub struct CounterAccount {
+    pub count: u32,
+}
+
+#[proc_macro_derive(BorshDeserialize,attribute(bosh_init, bosh_skip))] //for fns proc_macro_derive
+pub fn bosh_deserialze() {
+
+}
+#[proc_macro_derive(BorshSerialize, attribute(bosh_skip))]
+pub fn borsh_serialize(input: TokenStream) -> TokenStream {
+    // Serialization logic...
+}
+
+
+//practice, counter contract
+
+//imports-
+use borsh::{BorshDeserialize, BorshSerialize};
+
+use solana_program::{
+    account_info::{next_account_info, AccountInfo},
+    entrypoint,
+    entrypoint::ProgramResult,
+    pubkey::PubKey,
+    program_error::ProgramError
+};
+
+//data accnt
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
+
+pub struct CountAccount {
+    counter: i32
+}
+
+entrypoint!(process_instruction);
+
+fn process_instruction(
+    accounts: &[AccountInfo],
+    program_id: &PubKey,
+    instructions_data: &[u8],
+) -> ProgramResult {
+    //get the count accnt
+
+    let accounts_iter = &mut accounts.iter();
+    let caller_accnt = next_account_info(accounts_iter)?;
+
+    if caller_accnt.owner != program_id {
+        return Err(ProgramError::IncorrectProgramId)
+    }
+    let counter = CountAccount::try_from_slice(& caller_accnt.data.borrow())?; //account.data - the data accnt associated with the program accnt
+    counter.count += 1;
+
+    //serialize into bytes array
+    counter.serialize(&mut *caller_accnt.data.borrow_mut()) //taking a mutable reference and dereferncing it. Writing value to the field of the struct and then serializing it. 
+}
