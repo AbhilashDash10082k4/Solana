@@ -1,0 +1,6 @@
+[package]
+name = "derive_macro_from_superdevs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]

@@ -70,7 +70,7 @@ Calculating area of shapes
 
 enum Shape {
     Circle(f64),
-    Sqaure(f64),
+    Square(f64),
 }
 fn calc_area (shape: &Shape) -> f64 {
     match shape{
@@ -89,7 +89,7 @@ fn process_pnt (pnt: Point) {
     }
 }
 fn main() {
-    let circle = Shape::Circle(7,0);
+    let circle = Shape::Circle(7.0);
     let square = Shape::Square(7.0);
     println!("{}", cal_area(&circle));
     println!("{}", cal_area(&square));
@@ -128,7 +128,7 @@ impl Rect {
 }
 fn main() {
     let rect = Rect {h:7, w:7};
-    println!("area, {}", rect.area())
+    println!("area, {}", rect.area()) //declaring non static funcn
 }
 
 
@@ -141,7 +141,7 @@ impl Square {
         Square.s * Square.s
     }
 
-    //associating fn
+    //associating fn - static method
     fn new(side: i32) -> Self {
         Square {s}
     }

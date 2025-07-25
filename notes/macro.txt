@@ -6,6 +6,8 @@ Procedural Macros enable developers to use Rust code to process input and genera
 
 AST (Abstract Syntax Tree): Rust source code is parsed into lexical units (Tokens) by the compiler, further forming a tree-like structure where each node represents a syntax element such as expressions, statements, function declarations, etc. The tree structure reflects the nesting and hierarchical relationships in the source code.
 
+cargo expand - expand a macro
+
 // Logging macro: println!
 println!("hello, micro");
 
@@ -91,7 +93,7 @@ macro_rules! vec {
         let temp_vec = Vec::new();
         $(
             temp_vec.push($x);
-        )*
+        )* //$ -initialises a variable and * makes it repeatable many times
         temp_vec
     }
 }
