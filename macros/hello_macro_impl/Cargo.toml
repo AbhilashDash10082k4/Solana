@@ -1,0 +1,8 @@
+[package]
+name = "hello_macro_impl"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+hello_macro_second = { path = "../hello_macro_second" }
+hello_macro_derive_second = { path = "../hello_macro_second/hello_macro_derive_second" }
