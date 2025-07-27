@@ -12,5 +12,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "devDependencies": {
+    "@solana/web3.js": "^1.98.2",
+    "@types/mocha": "^10.0.10",
+    "mocha": "^11.7.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
 }
