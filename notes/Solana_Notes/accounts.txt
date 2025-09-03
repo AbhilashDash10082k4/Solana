@@ -1,0 +1,22 @@
+Accounts -
+EOA - externally owned accnts - do not have associated executable accnt, handled by pvt key, can send txns, send txns for contract executn, 
+contract accnt - Contract account contain contract code. - aka Program accnts
+They are created by external owned account or other contracts. 
+Contracts, when created, are automatically assigned to an account address used for storing contract code and any storage data generated during contract deployment or execution. 
+The address of a contract account is generated through the SHA3 hashing algorithm and not a private key.
+As it lacks a private key, a contract account cannot be used as an external owned account. Contract execution and code invocation are only possible through an external owned account.
+
+Solana acnts -
+- Entire Solana is an Accounts table with key value pairs of Accounts and their addresses
+- Account  type contains - lamports, data, owner, rent epoch - chk the accnt_type.rs file
+- Every accnt has a program owner which can deduct the balance of the accnt, transfer SOL etc.
+- Sysvar accnts are special accnts that store cluster state
+- Program accnt- contract - executable, stateless, read only, stores code and no state
+- Data accnt - stores data of runtime of program accnt, is owned by a program accnt and the program accnt can make Changes in data accnt
+- Every accnts are by default owned by System Program and are first created by System Program. Then it transfers ownership of the accnt (e.g wallet) to another specified program accnts. System program does this 4 acnts-
+
+-accnt creatn, space allocation for the data field, ownership transform, change the lamport balance of the accnts
+
+- wallet are owned by SP(system Program)
+//PDA - deterministically made up of seeds and a program ID(pubkey or address)
+

@@ -50,19 +50,6 @@ Block creation proc by poh nd pos-
 4. PoH chains are packed into block and are published to the chain
 5. the other nodes validate the new block and then add them to the network
 
-
-Accounts -
-EOA - externally owned accnts - do not have associated executable accnt, handled by pvt key, can send txns, send txns for contract executn, 
-contract accnt - Contract account contain contract code. 
-They are created by external owned account or other contracts. 
-Contracts, when created, are automatically assigned to an account address used for storing contract code and any storage data generated during contract deployment or execution. 
-The address of a contract account is generated through the SHA3 hashing algorithm and not a private key.
- As it lacks a private key, a contract account cannot be used as an external owned account. Contract execution and code invocation are only possible through an external owned account.
-
-Solana acnts -
-Program accnt- contract - executable, stateless, read only, stoes code and no state
-Data accnt - stores data of runtime of program accnt, is owned by a program accnt and the program accnt can make Changes in data accnt
-
 Fees -
 Rent -fees paid to store data on the network . If an account cannot afford the rent, the system deletes that account to reduce storage costs for data that is no longer maintained. An account can be exempted from paying rent if the assets in the account exceed the minimum balance for two years' rent. The rent storage cost on Solana is 0.00000348 SOL per byte, and a typical wallet data size is 372 bytes/year, requiring every active wallet holder to maintain 0.0026 SOL.
 
