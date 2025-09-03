@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const web3_js_1 = require("@solana/web3.js");
+const programAddress = new web3_js_1.PublicKey("11111111111111111111111111111111");
+const seed = [Buffer.from("adsince2k4")];
+const [pda, bump] = web3_js_1.PublicKey.findProgramAddressSync(seed, programAddress);
+const keypair = web3_js_1.Keypair.generate();
+console.log("PDA: ", pda);
+console.log("SEED: ", seed);
+console.log("programAddress: ", programAddress);
+console.log("BUMP: ", bump);
+console.log(`Public Key: ${keypair.publicKey}`);
+console.log(`Secret Key: ${keypair.secretKey}`);
