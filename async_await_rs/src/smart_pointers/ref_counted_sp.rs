@@ -3,6 +3,9 @@
 - tracks the no of owners of a single data
 - works in single thread
 - Rc::clone increases the no. of references and does not deep copy teh entire data
+- Rc<T> instance is only cleaned up if its strong_count is 0.
+- strong_count == 0 for Rc<T> to go out of scope
+- Rc::downgrade returns Weak<T> that uses weak_count to track weak references -> this does not indicate ownership relation as strong_count and need not to be  0 for Rc<T> to go out of scope
 */
 use std::rc::Rc;
 #[derive(Debug)]
